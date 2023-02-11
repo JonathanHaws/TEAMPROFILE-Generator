@@ -17,23 +17,28 @@ function createCard(name, role, id, email, role_specific_info){
     return '<div style="'+ cardstyle +'"><div style="'+ headerstyle +'">'+ header +'</div><div style ="' + infostyle + '">' + info + '</div></div>\n';
 }
 
-inquirer.prompt([
-    { type: 'input', message: 'What is the managers name?', name: 'name',},
-    { type: 'input', message: 'What is the managers id?', name: 'id',},
-    { type: 'input', message: 'What is the managers email?', name: 'email',},
-    { type: 'input', message: 'What is the managers office id?', name: 'office_id',}
+async function promptForEmployee(manager){
+    if (manager){ var role = "Manager"; } else { var role = await inquirer.prompt({ type: 'list', message: 'What type of employee are they?', choices: ['Engineer', 'Intern',], name:'role'}); role = role.role;} 
+    var name  = await inquirer.prompt({ type: 'input', message: 'What is the employees name?', name:'name' }); name = name.name;
+    var id    = await inquirer.prompt({ type: 'input', message: 'What is the employees id?', name:'id' }); id = id.id;
+    var email = await inquirer.prompt({ type: 'input', message: 'What is the employees email?', name:'email' }); email = email.email;
+     
+    if (role == "Manager"){ 
+        var officeId = await inquirer.prompt({ type: 'input', message: 'What is their office id?', name:'officeId' }); officeId = officeId.officeId;
+        return new Manager(name, id, email, officeId)
+    } else if (role == "Engineer"){
+    } else if (role == "Intern"){         
+    }
+    return new Employee(name, id, email);
+}
 
-    ]).then(function(response){
-        
-        let manager = new Manager(response.name, response.id, response.email, response.office_id);
-        console.log(manager.getRole());
+promptForEmployee("Manager").then( function(manager){ console.log(manager) })
 
-        let htmldoccument; let cssdocument;
-        htmldoccument = createCard(manager.getName(),manager.getRole(),manager.getId(),manager.getEmail(),manager.getOfficeNumber());
-        htmldocument = '\n<!DOCTYPE html>\n  <head>\n    <link rel="stylesheet" href="style.css">\n  </head>\n  <body>\n    ' + htmldoccument + '  </body>\n</html>\n';
-        cssdocument = '\nbody{\n background-color:#d1d1d1;\n text-align:center;\n}\n'
-        fs.writeFile('./dist/index.html', htmldocument, (err)=>{})
-        fs.writeFile('./dist/style.css', cssdocument , (err)=>{});
-    });
+//let htmldoccument; let cssdocument;
+//htmldoccument = createCard(manager.getName(),manager.getRole(),manager.getId(),manager.getEmail(),manager.getOfficeNumber());
+//htmldocument = '\n<!DOCTYPE html>\n  <head>\n    <link rel="stylesheet" href="style.css">\n  </head>\n  <body>\n    ' + htmldoccument + '  </body>\n</html>\n';
+//cssdocument = '\nbody{\n background-color:#d1d1d1;\n text-align:center;\n}\n'
+//fs.writeFile('./dist/index.html', htmldocument, (err)=>{})
+//fs.writeFile('./dist/style.css', cssdocument , (err)=>{});
 
-//{ type: 'list', message: 'What type of employee?', name: 'type', choices: ['Engineer', 'Intern',],}])
+
